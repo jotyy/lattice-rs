@@ -342,7 +342,6 @@ jobs:
         node:
           - '14'
           - '16'
-          - '18'
     runs-on: ubuntu-latest
     steps:
       - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
