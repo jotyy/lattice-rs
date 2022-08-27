@@ -1,10 +1,11 @@
+use k256::ecdsa::{recoverable::Signature, signature::Signer, SigningKey};
 use libsm::{
   sm2::{ecc::EccCtx, signature::SigCtx},
   sm3::hash::Sm3Hash,
 };
 use num_bigint::BigUint;
 use once_cell::sync::Lazy;
-use secp256k1::{rand::rngs::OsRng, All, Message, PublicKey, Secp256k1, SecretKey};
+use rand_core::OsRng;
 use sha256::digest_bytes;
 
 // Cryptography types.
@@ -36,7 +37,6 @@ pub struct KeyPair {
   pub crypto: Cryptography,
 }
 
-static CONTEXT_NIST: Lazy<Secp256k1<All>> = Lazy::new(Secp256k1::new);
 static CONTEXT_GM: Lazy<SigCtx> = Lazy::new(SigCtx::new);
 static CURVE_GM: Lazy<EccCtx> = Lazy::new(EccCtx::new);
 
@@ -44,12 +44,10 @@ impl KeyPair {
   pub fn new_keypair(crypto: Cryptography) -> KeyPair {
     match crypto {
       Cryptography::NIST => {
-        let mut rng = OsRng::new().expect("OsRng");
-        let (sk, pk) = CONTEXT_NIST.generate_keypair(&mut rng);
-
+        let signing_key = SigningKey::random(&mut OsRng);
         KeyPair {
-          pk: pk.serialize_uncompressed().to_vec(),
-          sk: BigUint::from_bytes_be(&sk.serialize_secret()),
+          pk: signing_key.verifying_key().to_bytes().to_vec(),
+          sk: BigUint::from_bytes_be(&signing_key.to_bytes().to_vec()),
           crypto,
         }
       }
@@ -68,11 +66,11 @@ impl KeyPair {
   pub fn from_secret_key(bytes: &[u8], crypto: Cryptography) -> KeyPair {
     match crypto {
       Cryptography::NIST => {
-        let sk = SecretKey::from_slice(bytes).unwrap();
-        let pk = PublicKey::from_secret_key(&CONTEXT_NIST, &sk);
+        let signing_key = SigningKey::from_bytes(bytes).unwrap();
+        let pk = signing_key.verifying_key().to_bytes();
 
         KeyPair {
-          pk: pk.serialize_uncompressed().to_vec(),
+          pk: pk.to_vec(),
           sk: BigUint::from_bytes_be(bytes),
           crypto,
         }
@@ -93,20 +91,20 @@ impl KeyPair {
   pub fn sign(&self, data: &[u8]) -> String {
     match self.crypto {
       Cryptography::NIST => {
-        let sk = SecretKey::from_slice(&self.sk.to_bytes_be()).unwrap();
-        let msg = Message::from_slice(&data).unwrap();
-        let (id, sig) = CONTEXT_NIST
-          .sign_ecdsa_recoverable(&msg, &sk)
-          .serialize_compact();
-        let r: &[u8] = &sig[..32];
-        let s: &[u8] = &sig[32..];
+        let signing_key = SigningKey::from_bytes(&self.sk.to_bytes_be()).unwrap();
+        let signature: Signature = signing_key.sign(data);
+        // let (id, sig) = CONTEXT_NIST
+        //   .sign_ecdsa_recoverable(&msg, &sk)
+        //   .serialize_compact();
+        // let r: &[u8] = &sig[..32];
+        // let s: &[u8] = &sig[32..];
         format!(
           "0x{}{}0{}",
-          hex::encode(r),
-          hex::encode(s),
+          hex::encode(signature.r().to_bytes()),
+          hex::encode(signature.s().to_bytes()),
           // BigUint::from_bytes_be(r).to_str_radix(16),
           // BigUint::from_bytes_be(s).to_str_radix(16),
-          BigUint::from(id.to_i32() as u32).to_str_radix(16),
+          BigUint::from(u8::from(signature.recovery_id())).to_str_radix(16),
         )
       }
       Cryptography::GM => {
