@@ -1,6 +1,6 @@
 import test from "ava";
 
-import { parseFilekey } from "../index.js";
+import { decryptFilekey } from "../index.js";
 
 test("parse filekey correct", (t) => {
   const filekey = {
@@ -31,7 +31,7 @@ test("parse filekey correct", (t) => {
   };
   const password = "Aa123456";
   t.is(
-    parseFilekey(JSON.stringify(filekey), password),
+    decryptFilekey(JSON.stringify(filekey), password).sk,
     "642400b95187ba1233444b3414fb9d7d676279ce458de5e67d0265753df75e7d"
   );
 });

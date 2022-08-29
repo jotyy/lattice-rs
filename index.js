@@ -236,6 +236,6 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { parseFilekey } = nativeBinding
+const { decryptFilekey } = nativeBinding
 
-module.exports.parseFilekey = parseFilekey
+module.exports.decryptFilekey = decryptFilekey
