@@ -27,7 +27,6 @@ test("parse filekey correct", (t) => {
         "b30d8f76dba49df976755b933192f7ad066b57eb754ddbee3a097d6c7ea3960b",
       mac: "28071ccac22c4f34e7043463f407baf581c5ad2317ca9b4bd80631113bc65b93",
     },
-    isGM: true,
   };
   const password = "Aa123456";
   t.is(

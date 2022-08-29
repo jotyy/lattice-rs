@@ -20,8 +20,12 @@ pub struct FileKey {
   pub uuid: String,
   pub address: String,
   pub cipher: Cipher,
-  #[serde(rename = "isGM")]
+  #[serde(rename = "isGM", default = "default_gm")]
   pub is_gm: bool,
+}
+
+fn default_gm() -> bool {
+  false
 }
 
 #[derive(Serialize, Deserialize, Debug)]
