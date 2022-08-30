@@ -37,7 +37,8 @@ pub fn encrypt_filekey(private_key: String, password: String, is_gm: bool) -> St
   } else {
     Cryptography::NIST
   };
-  let file_key = FileKey::from_secret_key(private_key.as_bytes(), password.as_bytes(), crypto);
+  let sk = hex::decode(private_key).unwrap();
+  let file_key = FileKey::from_secret_key(&sk, password.as_bytes(), crypto);
   let res = serde_json::to_string(&file_key).unwrap();
   res
 }
