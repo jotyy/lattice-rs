@@ -31,7 +31,7 @@ test("parse filekey correct", (t) => {
   };
   const password = "Aa123456";
   t.is(
-    decryptFilekey(JSON.stringify(filekey), password).sk,
+    decryptFilekey(JSON.stringify(filekey), password).privateKey,
     "642400b95187ba1233444b3414fb9d7d676279ce458de5e67d0265753df75e7d"
   );
 });
