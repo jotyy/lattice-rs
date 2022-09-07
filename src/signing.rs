@@ -1,4 +1,8 @@
-use k256::ecdsa::{recoverable::Signature, signature::Signer, SigningKey};
+use elliptic_curve::sec1::ToEncodedPoint;
+use k256::{
+  ecdsa::{recoverable::Signature, signature::Signer, SigningKey},
+  PublicKey,
+};
 use libsm::{
   sm2::{ecc::EccCtx, signature::SigCtx},
   sm3::hash::Sm3Hash,
@@ -67,7 +71,9 @@ impl KeyPair {
     match crypto {
       Cryptography::NIST => {
         let signing_key = SigningKey::from_bytes(bytes).unwrap();
-        let pk = signing_key.verifying_key().to_bytes();
+        let pk = PublicKey::from(&signing_key.verifying_key());
+        let pk = pk.to_encoded_point(false);
+        let pk = pk.as_bytes();
 
         KeyPair {
           pk: pk.to_vec(),
@@ -93,17 +99,11 @@ impl KeyPair {
       Cryptography::NIST => {
         let signing_key = SigningKey::from_bytes(&self.sk.to_bytes_be()).unwrap();
         let signature: Signature = signing_key.sign(data);
-        // let (id, sig) = CONTEXT_NIST
-        //   .sign_ecdsa_recoverable(&msg, &sk)
-        //   .serialize_compact();
-        // let r: &[u8] = &sig[..32];
-        // let s: &[u8] = &sig[32..];
+
         format!(
           "0x{}{}0{}",
           hex::encode(signature.r().to_bytes()),
           hex::encode(signature.s().to_bytes()),
-          // BigUint::from_bytes_be(r).to_str_radix(16),
-          // BigUint::from_bytes_be(s).to_str_radix(16),
           BigUint::from(u8::from(signature.recovery_id())).to_str_radix(16),
         )
       }

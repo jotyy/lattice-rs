@@ -71,3 +71,49 @@ test("encrypt filekey correct", (t) => {
     filekey.address
   );
 });
+
+test("encrypt nist filekey correct", (t) => {
+  const privateKey =
+    "cb1195d51d66f4c2cc5c863477fc3d26c2731de869a870fcef38da253615ef8d";
+  const password = "asdf1234";
+  t.is(
+    JSON.parse(encryptFilekey(privateKey, password, false)).address,
+    "zltc_WE7PFWmp3atUhk2t8K96jijz89uFcSwjp"
+  );
+});
+
+test("decrypt nist filekey", (t) => {
+  const filekey = {
+    uuid: "c7bd33b8-a520-41d9-a0b3-d56ea3980dbc",
+    address: "zltc_my9gyz31TQkGTutVvwfSpdeNZecyjHWpT",
+    cipher: {
+      aes: {
+        cipher: "aes-128-ctr",
+        iv: "2f9eaeb8f28c51d8d3f84e5c025dc6fb",
+      },
+      kdf: {
+        kdf: "scrypt",
+        kdfParams: {
+          DKLen: 32,
+          n: 262144,
+          p: 1,
+          r: 8,
+          salt: "0e916e0dfaf9c164690952056f30e29148b81c59f184a305059d6931f3120acc",
+        },
+      },
+      cipherText:
+        "19a93745eb44a5355e415d550af0ebf43cbb43c70a8ad1ed6bac7ecd5ae03c4e",
+      mac: "01eca651a5304c9b9f410c1bd968c9f6687a64f6e5b944f0387283462be02f7b",
+    },
+    isGM: false,
+  };
+  const privateKey =
+    "aea7ea1dd38b28d114c24f6a43a9c8d2525f701f509f24148d9d52b75c70139b";
+
+  const password = "1234qwer";
+
+  t.is(
+    decryptFilekey(JSON.stringify(filekey), password).privateKey,
+    privateKey
+  );
+});
