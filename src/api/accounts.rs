@@ -24,7 +24,7 @@ impl Accounts {
     &self,
     tx: TransactionRequest,
     key: &[u8],
-    chain_id: u64,
+    chain_id: u32,
     crypto: Cryptography,
   ) -> SignedTransaction {
     let key_pair = KeyPair::from_secret_key(key, crypto);

@@ -1,6 +1,6 @@
 import test from "ava";
 
-import { decryptFilekey, encryptFilekey } from "../index.js";
+import { decryptFilekey, encryptFilekey, signTransaction } from "../index.js";
 
 test("decrypt filekey correct", (t) => {
   const filekey = {

@@ -7,5 +7,10 @@ export interface Decrypted {
   privateKey: string
   isGm: boolean
 }
+export interface Signed {
+  pow: string
+  sign: string
+}
 export function decryptFilekey(filekey: string, password: string): Decrypted
 export function encryptFilekey(privateKey: string, password: string, isGm: boolean): string
+export function signTransaction(transaction: string, privateKey: string, chainId: number, isGm: boolean): Signed

@@ -52,13 +52,13 @@ impl TransactionRequest {
     Self::default()
   }
 
-  pub fn encode(&self, chain_id: u64, crypto: Cryptography) -> (BigUint, Vec<u8>) {
+  pub fn encode(&self, chain_id: u32, crypto: Cryptography) -> (BigUint, Vec<u8>) {
     let pow = self.pow(chain_id, crypto);
     let stream = self.rlp(chain_id, hex::encode(&pow.to_bytes_be()), crypto, true);
     (pow, stream.out().to_vec())
   }
 
-  pub fn pow(&self, chain_id: u64, crypto: Cryptography) -> BigUint {
+  pub fn pow(&self, chain_id: u32, crypto: Cryptography) -> BigUint {
     let mut i: u32 = 0;
     let min: BigUint = BigUint::from(1u32).shl(244);
     loop {
@@ -76,7 +76,7 @@ impl TransactionRequest {
   }
 
   /// Gets the unsigned transactions RLP encoding
-  pub fn rlp(&self, chain_id: u64, pow: String, crypto: Cryptography, is_sign: bool) -> RlpStream {
+  pub fn rlp(&self, chain_id: u32, pow: String, crypto: Cryptography, is_sign: bool) -> RlpStream {
     let mut rlp = RlpStream::new();
     rlp.begin_list(NUM_TX_FIELDS + if is_sign { 2 } else { 0 });
 
@@ -183,9 +183,12 @@ fn opt_num_to_vec(value: Option<u128>) -> Vec<u8> {
 
 #[cfg(test)]
 mod tests {
-    use rlp::RlpStream;
+  use rlp::RlpStream;
 
-    use crate::{types::transaction::TransactionRequest, signing::{Cryptography, KeyPair, hash_message}};
+  use crate::{
+    signing::{hash_message, Cryptography, KeyPair},
+    types::transaction::TransactionRequest,
+  };
 
   #[test]
   fn sign() {
