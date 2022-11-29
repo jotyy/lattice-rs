@@ -76,7 +76,7 @@ impl TransactionRequest {
   }
 
   /// Gets the unsigned transactions RLP encoding
-  pub fn rlp(&self, chain_id: u32, pow: String, crypto: Cryptography, is_sign: bool) -> RlpStream {
+  pub fn rlp(&self, chain_id: u32, _pow: String, crypto: Cryptography, is_sign: bool) -> RlpStream {
     let mut rlp = RlpStream::new();
     rlp.begin_list(NUM_TX_FIELDS + if is_sign { 2 } else { 0 });
 
@@ -136,9 +136,9 @@ impl TransactionRequest {
     rlp.append(&linker_addr);
     rlp.append(&opt_num_to_vec(self.amount));
     rlp.append(&opt_num_to_vec(self.joule));
-    rlp.append(&hex::decode(pow).unwrap());
-    // rlp.append(&hex::decode("").unwrap());
-    // rlp.append(&hex::decode("").unwrap());
+    // rlp.append(&hex::decode(pow).unwrap());
+    rlp.append(&hex::decode("").unwrap());
+    rlp.append(&hex::decode("").unwrap());
     rlp.append(&payload);
     rlp.append(&num_to_bytes(self.timestamp as u128));
     rlp.append(&num_to_bytes(chain_id as u128));
