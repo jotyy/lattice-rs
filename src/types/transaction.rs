@@ -53,7 +53,8 @@ impl TransactionRequest {
   }
 
   pub fn encode(&self, chain_id: u32, crypto: Cryptography) -> (BigUint, Vec<u8>) {
-    let pow = self.pow(chain_id, crypto);
+    // let pow = self.pow(chain_id, crypto);
+    let pow = BigUint::from(0 as u32);
     let stream = self.rlp(chain_id, hex::encode(&pow.to_bytes_be()), crypto, true);
     (pow, stream.out().to_vec())
   }
