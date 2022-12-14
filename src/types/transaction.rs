@@ -1,12 +1,10 @@
-use std::ops::Shl;
-
 use crate::signing::{hash_message, lattice_to_eth, Cryptography};
 
 use num_bigint::BigUint;
 use rlp::RlpStream;
 use serde::{Deserialize, Serialize};
 
-pub(crate) const NUM_TX_FIELDS: usize = 14;
+pub(crate) const NUM_TX_FIELDS: usize = 15;
 const ZERO_HASH: &str = "0x0000000000000000000000000000000000000000000000000000000000000000";
 const ZERO_LATTICE_ADDRESS: &str = "zltc_QLbz7JHiBTspS962RLKV8GndWFwjA5K66";
 
@@ -53,27 +51,9 @@ impl TransactionRequest {
   }
 
   pub fn encode(&self, chain_id: u32, crypto: Cryptography) -> (BigUint, Vec<u8>) {
-    // let pow = self.pow(chain_id, crypto);
     let pow = BigUint::from(0 as u32);
     let stream = self.rlp(chain_id, hex::encode(&pow.to_bytes_be()), crypto, true);
     (pow, stream.out().to_vec())
-  }
-
-  pub fn pow(&self, chain_id: u32, crypto: Cryptography) -> BigUint {
-    let mut i: u32 = 0;
-    let min: BigUint = BigUint::from(1u32).shl(244);
-    loop {
-      i = i + 1;
-      let pow = BigUint::from(i);
-      let stream = self.rlp(chain_id, hex::encode(&pow.to_bytes_be()), crypto, false);
-      let rlp = stream.out().to_vec();
-      let hash = hash_message(&rlp, crypto);
-      let bytes = hex::decode(hash).unwrap();
-      let calculated = BigUint::from_bytes_be(&bytes);
-      if calculated.le(&min) {
-        return pow;
-      }
-    }
   }
 
   /// Gets the unsigned transactions RLP encoding
@@ -159,7 +139,10 @@ fn type_to_vec(value: &str) -> Vec<u8> {
     "receive" => "03",
     "contract" => "04",
     "execute" => "05",
-    "beacon" => "06",
+    "update" => "07",
+    "contractRevoke" => "08",
+    "contractFreeze" => "09",
+    "contractRelease" => "09",
     _ => "00",
   };
   hex::decode(hex).unwrap()
