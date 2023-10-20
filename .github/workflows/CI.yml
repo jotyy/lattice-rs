@@ -167,14 +167,13 @@ jobs:
       - name: Build
         id: build
         uses: vmactions/freebsd-vm@v0
-        with:
-          release: 13.0
         env:
           DEBUG: napi:*
           RUSTUP_HOME: /usr/local/rustup
           CARGO_HOME: /usr/local/cargo
           RUSTUP_IO_THREADS: 1
         with:
+          release: 13.0
           envs: DEBUG RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS
           usesh: true
           mem: 3000
