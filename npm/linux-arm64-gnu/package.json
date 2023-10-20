@@ -1,6 +1,6 @@
 {
   "name": "@latticelabs/rs-linux-arm64-gnu",
-  "version": "0.0.14",
+  "version": "0.0.9",
   "os": [
     "linux"
   ],
