@@ -173,7 +173,7 @@ jobs:
           CARGO_HOME: /usr/local/cargo
           RUSTUP_IO_THREADS: 1
         with:
-          release: 13.0
+          release: 13.1
           envs: DEBUG RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS
           usesh: true
           mem: 3000
