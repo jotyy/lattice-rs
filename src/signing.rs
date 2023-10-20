@@ -113,11 +113,36 @@ impl KeyPair {
         let e = CONTEXT_GM.hash("1234567812345678", &pk, data);
         let rs = CONTEXT_GM.sign_raw(&e, &self.sk);
         format!(
-          "{}{}01{}",
+          "0x{}{}01{}",
           rs.get_r().to_str_radix(16),
           rs.get_s().to_str_radix(16),
           hex::encode(e),
         )
+      }
+    }
+  }
+
+  pub fn verify(&self, data: &[u8], signature: &str) -> bool {
+    match self.crypto {
+      Cryptography::NIST => {
+        // let signature = hex::decode(signature).unwrap();
+        // let mut bytes = [0u8; 65];
+        // bytes[..65].copy_from_slice(&signature);
+
+        // let signature = Signature::new();
+        // let signing_key = SigningKey::from_bytes(&self.sk.to_bytes_be()).unwrap();
+        // let verifying_key = VerifyingKey::from(&signing_key);
+
+        // verifying_key.verify(data, &signature).is_ok()
+        true
+      }
+      Cryptography::GM => {
+        let signature = hex::decode(signature).unwrap();
+        let pk = CURVE_GM.bytes_to_point(&self.pk).unwrap();
+        let signature =
+          libsm::sm2::signature::Signature::new(&signature[0..32], &signature[32..64]);
+
+        CONTEXT_GM.verify(data, &pk, &signature)
       }
     }
   }
