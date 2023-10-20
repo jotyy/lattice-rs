@@ -167,6 +167,8 @@ jobs:
       - name: Build
         id: build
         uses: vmactions/freebsd-vm@v0
+        with:
+        release: 13.0
         env:
           DEBUG: napi:*
           RUSTUP_HOME: /usr/local/rustup
